@@ -1,0 +1,856 @@
+version: 1
+description: 臺灣村里行政區整併紀錄 (從內政部行政區圖比對自動產生，需人工 review)
+generated_from: data/{民國年}年12月行政區人口統計_村里_SHP
+year_format: effective_year=西元, effective_year_roc=民國; 事件代表 effective_year 起該邊界生效
+type_glossary:
+  rename: 改名或代碼重編，幾何不變或微調
+  merge: 多個來源村里合併為一個 (V_ID 數減少)
+  split: 一個來源村里分割為多個 (V_ID 數增加)
+  redistribute: M→N 重劃，多對多重新分配
+  boundary_adjust: V_ID 不變但幾何顯著變動 (>5% 對稱差)
+events:
+- id: 110_111_rename_10007220-006
+  effective_year: 2022
+  effective_year_roc: 111
+  type: rename
+  sources:
+  - v_id: 10007220-006
+    county: 彰化縣
+    town: 埤頭鄉
+    village: 永豊村
+  targets:
+  - v_id: 10007220-018
+    county: 彰化縣
+    town: 埤頭鄉
+    village: 永豐村
+  overlap:
+  - from: 10007220-006
+    to: 10007220-018
+    pct_of_source: 1.0
+  - to: 10007220-018
+    from: 10007220-006
+    pct_of_target: 1.0
+- id: 110_111_merge_64000140-018
+  effective_year: 2022
+  effective_year_roc: 111
+  type: merge
+  sources:
+  - v_id: 64000140-018
+    county: 高雄市
+    town: 大寮區
+    village: 忠義里
+  - v_id: 64000140-024
+    county: 高雄市
+    town: 大寮區
+    village: 光武里
+  targets:
+  - v_id: 64000140-018
+    county: 高雄市
+    town: 大寮區
+    village: 忠義里
+  overlap:
+  - from: 64000140-024
+    to: 64000140-018
+    pct_of_source: 1.0
+- id: 110_111_rename_67000290-019
+  effective_year: 2022
+  effective_year_roc: 111
+  type: rename
+  sources:
+  - v_id: 67000290-019
+    county: 臺南市
+    town: 關廟區
+    village: 南雄里
+  targets:
+  - v_id: 67000290-020
+    county: 臺南市
+    town: 關廟區
+    village: 龜洞里
+  overlap:
+  - from: 67000290-019
+    to: 67000290-020
+    pct_of_source: 1.0
+  - to: 67000290-020
+    from: 67000290-019
+    pct_of_target: 1.0
+- id: 110_111_split_10007020-005
+  effective_year: 2022
+  effective_year_roc: 111
+  type: split
+  sources:
+  - v_id: 10007020-005
+    county: 彰化縣
+    town: 鹿港鎮
+    village: 頂厝里
+  targets:
+  - v_id: 10007020-005
+    county: 彰化縣
+    town: 鹿港鎮
+    village: 頂厝里
+  - v_id: 10007020-030
+    county: 彰化縣
+    town: 鹿港鎮
+    village: 鹿和里
+  - v_id: 10007020-031
+    county: 彰化縣
+    town: 鹿港鎮
+    village: 鹿東里
+  overlap:
+  - to: 10007020-030
+    from: 10007020-005
+    pct_of_target: 1.0
+  - to: 10007020-031
+    from: 10007020-005
+    pct_of_target: 1.0
+- id: 110_111_split_10008120-008
+  effective_year: 2022
+  effective_year_roc: 111
+  type: split
+  sources:
+  - v_id: 10008120-008
+    county: 南投縣
+    town: 信義鄉
+    village: 望美村
+  targets:
+  - v_id: 10008120-008
+    county: 南投縣
+    town: 信義鄉
+    village: 望美村
+  - v_id: 10008120-015
+    county: 南投縣
+    town: 信義鄉
+    village: 卡里布安村
+  overlap:
+  - to: 10008120-015
+    from: 10008120-008
+    pct_of_target: 1.0
+- id: 110_111_split_68000010-022
+  effective_year: 2022
+  effective_year_roc: 111
+  type: split
+  sources:
+  - v_id: 68000010-022
+    county: 桃園市
+    town: 桃園區
+    village: 新埔里
+  targets:
+  - v_id: 68000010-022
+    county: 桃園市
+    town: 桃園區
+    village: 新埔里
+  - v_id: 68000010-080
+    county: 桃園市
+    town: 桃園區
+    village: 經國里
+  overlap:
+  - to: 68000010-080
+    from: 68000010-022
+    pct_of_target: 1.0
+- id: 110_111_split_68000010-006
+  effective_year: 2022
+  effective_year_roc: 111
+  type: split
+  sources:
+  - v_id: 68000010-006
+    county: 桃園市
+    town: 桃園區
+    village: 會稽里
+  targets:
+  - v_id: 68000010-006
+    county: 桃園市
+    town: 桃園區
+    village: 會稽里
+  - v_id: 68000010-081
+    county: 桃園市
+    town: 桃園區
+    village: 檜樂里
+  overlap:
+  - to: 68000010-081
+    from: 68000010-006
+    pct_of_target: 1.0
+- id: 110_111_split_68000010-058
+  effective_year: 2022
+  effective_year_roc: 111
+  type: split
+  sources:
+  - v_id: 68000010-058
+    county: 桃園市
+    town: 桃園區
+    village: 寶山里
+  targets:
+  - v_id: 68000010-058
+    county: 桃園市
+    town: 桃園區
+    village: 寶山里
+  - v_id: 68000010-082
+    county: 桃園市
+    town: 桃園區
+    village: 寶民里
+  overlap:
+  - to: 68000010-082
+    from: 68000010-058
+    pct_of_target: 1.0
+- id: 110_111_split_68000020-022
+  effective_year: 2022
+  effective_year_roc: 111
+  type: split
+  sources:
+  - v_id: 68000020-022
+    county: 桃園市
+    town: 中壢區
+    village: 洽溪里
+  targets:
+  - v_id: 68000020-022
+    county: 桃園市
+    town: 中壢區
+    village: 洽溪里
+  - v_id: 68000020-086
+    county: 桃園市
+    town: 中壢區
+    village: 青溪里
+  overlap:
+  - to: 68000020-086
+    from: 68000020-022
+    pct_of_target: 1.0
+- id: 110_111_split_68000020-033
+  effective_year: 2022
+  effective_year_roc: 111
+  type: split
+  sources:
+  - v_id: 68000020-033
+    county: 桃園市
+    town: 中壢區
+    village: 復興里
+  targets:
+  - v_id: 68000020-033
+    county: 桃園市
+    town: 中壢區
+    village: 復興里
+  - v_id: 68000020-087
+    county: 桃園市
+    town: 中壢區
+    village: 興華里
+  overlap:
+  - to: 68000020-087
+    from: 68000020-033
+    pct_of_target: 1.0
+- id: 110_111_split_68000020-036
+  effective_year: 2022
+  effective_year_roc: 111
+  type: split
+  sources:
+  - v_id: 68000020-036
+    county: 桃園市
+    town: 中壢區
+    village: 忠福里
+  targets:
+  - v_id: 68000020-036
+    county: 桃園市
+    town: 中壢區
+    village: 忠福里
+  - v_id: 68000020-088
+    county: 桃園市
+    town: 中壢區
+    village: 興福里
+  overlap:
+  - to: 68000020-088
+    from: 68000020-036
+    pct_of_target: 1.0
+- id: 110_111_split_68000060-005
+  effective_year: 2022
+  effective_year_roc: 111
+  type: split
+  sources:
+  - v_id: 68000060-005
+    county: 桃園市
+    town: 大園區
+    village: 橫峰里
+  targets:
+  - v_id: 68000060-005
+    county: 桃園市
+    town: 大園區
+    village: 橫峰里
+  - v_id: 68000060-020
+    county: 桃園市
+    town: 大園區
+    village: 青峰里
+  - v_id: 68000060-021
+    county: 桃園市
+    town: 大園區
+    village: 青山里
+  overlap:
+  - to: 68000060-020
+    from: 68000060-005
+    pct_of_target: 1.0
+  - to: 68000060-021
+    from: 68000060-005
+    pct_of_target: 1.0
+- id: 110_111_redistribute_68000080-001
+  effective_year: 2022
+  effective_year_roc: 111
+  type: redistribute
+  sources:
+  - v_id: 68000080-001
+    county: 桃園市
+    town: 八德區
+    village: 興仁里
+  - v_id: 68000080-002
+    county: 桃園市
+    town: 八德區
+    village: 福興里
+  targets:
+  - v_id: 68000080-001
+    county: 桃園市
+    town: 八德區
+    village: 興仁里
+  - v_id: 68000080-002
+    county: 桃園市
+    town: 八德區
+    village: 福興里
+  - v_id: 68000080-049
+    county: 桃園市
+    town: 八德區
+    village: 福元里
+  - v_id: 68000080-050
+    county: 桃園市
+    town: 八德區
+    village: 福德里
+  - v_id: 68000080-051
+    county: 桃園市
+    town: 八德區
+    village: 興中里
+  overlap:
+  - to: 68000080-049
+    from: 68000080-002
+    pct_of_target: 0.9531
+  - to: 68000080-050
+    from: 68000080-001
+    pct_of_target: 0.6523
+  - to: 68000080-050
+    from: 68000080-002
+    pct_of_target: 0.3477
+  - to: 68000080-051
+    from: 68000080-001
+    pct_of_target: 1.0
+- id: 110_111_redistribute_68000090-012
+  effective_year: 2022
+  effective_year_roc: 111
+  type: redistribute
+  sources:
+  - v_id: 68000090-012
+    county: 桃園市
+    town: 龍潭區
+    village: 高原里
+  - v_id: 68000090-016
+    county: 桃園市
+    town: 龍潭區
+    village: 三和里
+  targets:
+  - v_id: 68000090-012
+    county: 桃園市
+    town: 龍潭區
+    village: 高原里
+  - v_id: 68000090-016
+    county: 桃園市
+    town: 龍潭區
+    village: 三和里
+  - v_id: 68000090-033
+    county: 桃園市
+    town: 龍潭區
+    village: 渴望里
+  overlap:
+  - to: 68000090-033
+    from: 68000090-012
+    pct_of_target: 0.132
+  - to: 68000090-033
+    from: 68000090-016
+    pct_of_target: 0.868
+- id: 110_111_boundary_adjust_10018020-034
+  effective_year: 2022
+  effective_year_roc: 111
+  type: boundary_adjust
+  sources:
+  - v_id: 10018020-034
+    county: 新竹市
+    town: 北區
+    village: 南勢里
+  - v_id: 10018020-035
+    county: 新竹市
+    town: 北區
+    village: 大鵬里
+  targets:
+  - v_id: 10018020-034
+    county: 新竹市
+    town: 北區
+    village: 南勢里
+  - v_id: 10018020-035
+    county: 新竹市
+    town: 北區
+    village: 大鵬里
+  symdiff_pct:
+    10018020-034: 1.3134
+    10018020-035: 0.5789
+- id: 110_111_boundary_adjust_10008010-010
+  effective_year: 2022
+  effective_year_roc: 111
+  type: boundary_adjust
+  sources:
+  - v_id: 10008010-010
+    county: 南投縣
+    town: 南投市
+    village: 軍功里
+  - v_id: 10008010-029
+    county: 南投縣
+    town: 南投市
+    village: 內興里
+  - v_id: 10008010-030
+    county: 南投縣
+    town: 南投市
+    village: 內新里
+  targets:
+  - v_id: 10008010-010
+    county: 南投縣
+    town: 南投市
+    village: 軍功里
+  - v_id: 10008010-029
+    county: 南投縣
+    town: 南投市
+    village: 內興里
+  - v_id: 10008010-030
+    county: 南投縣
+    town: 南投市
+    village: 內新里
+  symdiff_pct:
+    10008010-010: 0.2105
+    10008010-029: 0.31
+    10008010-030: 1.3077
+- id: 110_111_boundary_adjust_10009020-001
+  effective_year: 2022
+  effective_year_roc: 111
+  type: boundary_adjust
+  sources:
+  - v_id: 10009020-001
+    county: 雲林縣
+    town: 斗南鎮
+    village: 東仁里
+  - v_id: 10009020-003
+    county: 雲林縣
+    town: 斗南鎮
+    village: 南昌里
+  - v_id: 10009020-006
+    county: 雲林縣
+    town: 斗南鎮
+    village: 舊社里
+  - v_id: 10009020-011
+    county: 雲林縣
+    town: 斗南鎮
+    village: 阿丹里
+  targets:
+  - v_id: 10009020-001
+    county: 雲林縣
+    town: 斗南鎮
+    village: 東仁里
+  - v_id: 10009020-003
+    county: 雲林縣
+    town: 斗南鎮
+    village: 南昌里
+  - v_id: 10009020-006
+    county: 雲林縣
+    town: 斗南鎮
+    village: 舊社里
+  - v_id: 10009020-011
+    county: 雲林縣
+    town: 斗南鎮
+    village: 阿丹里
+  symdiff_pct:
+    10009020-001: 0.6444
+    10009020-003: 0.3167
+    10009020-006: 1.0923
+    10009020-011: 0.0611
+- id: 110_111_boundary_adjust_10018030-010
+  effective_year: 2022
+  effective_year_roc: 111
+  type: boundary_adjust
+  sources:
+  - v_id: 10018030-010
+    county: 新竹市
+    town: 香山區
+    village: 東香里
+  - v_id: 10018030-024
+    county: 新竹市
+    town: 香山區
+    village: 頂福里
+  targets:
+  - v_id: 10018030-010
+    county: 新竹市
+    town: 香山區
+    village: 東香里
+  - v_id: 10018030-024
+    county: 新竹市
+    town: 香山區
+    village: 頂福里
+  symdiff_pct:
+    10018030-010: 0.1013
+    10018030-024: 0.775
+- id: 110_111_boundary_adjust_68000080-005
+  effective_year: 2022
+  effective_year_roc: 111
+  type: boundary_adjust
+  sources:
+  - v_id: 68000080-005
+    county: 桃園市
+    town: 八德區
+    village: 瑞德里
+  targets:
+  - v_id: 68000080-005
+    county: 桃園市
+    town: 八德區
+    village: 瑞德里
+  symdiff_pct:
+    68000080-005: 0.3307
+- id: 110_111_boundary_adjust_10008110-009
+  effective_year: 2022
+  effective_year_roc: 111
+  type: boundary_adjust
+  sources:
+  - v_id: 10008110-009
+    county: 南投縣
+    town: 水里鄉
+    village: 頂崁村
+  - v_id: 10008110-015
+    county: 南投縣
+    town: 水里鄉
+    village: 民和村
+  targets:
+  - v_id: 10008110-009
+    county: 南投縣
+    town: 水里鄉
+    village: 頂崁村
+  - v_id: 10008110-015
+    county: 南投縣
+    town: 水里鄉
+    village: 民和村
+  symdiff_pct:
+    10008110-009: 0.3284
+    10008110-015: 0.1397
+- id: 110_111_boundary_adjust_64000190-001
+  effective_year: 2022
+  effective_year_roc: 111
+  type: boundary_adjust
+  sources:
+  - v_id: 64000190-001
+    county: 高雄市
+    town: 岡山區
+    village: 平安里
+  - v_id: 64000190-004
+    county: 高雄市
+    town: 岡山區
+    village: 維仁里
+  targets:
+  - v_id: 64000190-001
+    county: 高雄市
+    town: 岡山區
+    village: 平安里
+  - v_id: 64000190-004
+    county: 高雄市
+    town: 岡山區
+    village: 維仁里
+  symdiff_pct:
+    64000190-001: 0.1413
+    64000190-004: 0.1856
+- id: 110_111_boundary_adjust_63000090-020
+  effective_year: 2022
+  effective_year_roc: 111
+  type: boundary_adjust
+  sources:
+  - v_id: 63000090-020
+    county: 臺北市
+    town: 南港區
+    village: 重陽里
+  targets:
+  - v_id: 63000090-020
+    county: 臺北市
+    town: 南港區
+    village: 重陽里
+  symdiff_pct:
+    63000090-020: 0.1633
+- id: 110_111_boundary_adjust_10018020-033
+  effective_year: 2022
+  effective_year_roc: 111
+  type: boundary_adjust
+  sources:
+  - v_id: 10018020-033
+    county: 新竹市
+    town: 北區
+    village: 西雅里
+  - v_id: 10018020-045
+    county: 新竹市
+    town: 北區
+    village: 中雅里
+  targets:
+  - v_id: 10018020-033
+    county: 新竹市
+    town: 北區
+    village: 西雅里
+  - v_id: 10018020-045
+    county: 新竹市
+    town: 北區
+    village: 中雅里
+  symdiff_pct:
+    10018020-033: 0.0506
+    10018020-045: 0.0808
+- id: 111_112_boundary_adjust_66000250-005
+  effective_year: 2023
+  effective_year_roc: 112
+  type: boundary_adjust
+  sources:
+  - v_id: 66000250-005
+    county: 臺中市
+    town: 龍井區
+    village: 福田里
+  - v_id: 66000250-006
+    county: 臺中市
+    town: 龍井區
+    village: 麗水里
+  targets:
+  - v_id: 66000250-005
+    county: 臺中市
+    town: 龍井區
+    village: 福田里
+  - v_id: 66000250-006
+    county: 臺中市
+    town: 龍井區
+    village: 麗水里
+  symdiff_pct:
+    66000250-005: 0.5669
+    66000250-006: 0.3759
+- id: 111_112_boundary_adjust_64000310-011
+  effective_year: 2023
+  effective_year_roc: 112
+  type: boundary_adjust
+  sources:
+  - v_id: 64000310-011
+    county: 高雄市
+    town: 美濃區
+    village: 中圳里
+  - v_id: 64000310-014
+    county: 高雄市
+    town: 美濃區
+    village: 瀰濃里
+  targets:
+  - v_id: 64000310-011
+    county: 高雄市
+    town: 美濃區
+    village: 中圳里
+  - v_id: 64000310-014
+    county: 高雄市
+    town: 美濃區
+    village: 瀰濃里
+  symdiff_pct:
+    64000310-011: 0.1644
+    64000310-014: 0.541
+- id: 111_112_boundary_adjust_10010140-002
+  effective_year: 2023
+  effective_year_roc: 112
+  type: boundary_adjust
+  sources:
+  - v_id: 10010140-002
+    county: 嘉義縣
+    town: 竹崎鄉
+    village: 和平村
+  - v_id: 10010140-006
+    county: 嘉義縣
+    town: 竹崎鄉
+    village: 義和村
+  - v_id: 10010140-007
+    county: 嘉義縣
+    town: 竹崎鄉
+    village: 義仁村
+  targets:
+  - v_id: 10010140-002
+    county: 嘉義縣
+    town: 竹崎鄉
+    village: 和平村
+  - v_id: 10010140-006
+    county: 嘉義縣
+    town: 竹崎鄉
+    village: 義和村
+  - v_id: 10010140-007
+    county: 嘉義縣
+    town: 竹崎鄉
+    village: 義仁村
+  symdiff_pct:
+    10010140-002: 0.0502
+    10010140-006: 0.316
+    10010140-007: 0.2545
+- id: 111_112_boundary_adjust_10014060-005
+  effective_year: 2023
+  effective_year_roc: 112
+  type: boundary_adjust
+  sources:
+  - v_id: 10014060-005
+    county: 臺東縣
+    town: 池上鄉
+    village: 福原村
+  targets:
+  - v_id: 10014060-005
+    county: 臺東縣
+    town: 池上鄉
+    village: 福原村
+  symdiff_pct:
+    10014060-005: 0.0997
+- id: 111_112_boundary_adjust_10014060-004
+  effective_year: 2023
+  effective_year_roc: 112
+  type: boundary_adjust
+  sources:
+  - v_id: 10014060-004
+    county: 臺東縣
+    town: 池上鄉
+    village: 大埔村
+  targets:
+  - v_id: 10014060-004
+    county: 臺東縣
+    town: 池上鄉
+    village: 大埔村
+  symdiff_pct:
+    10014060-004: 0.0936
+- id: 112_113_boundary_adjust_64000120-072
+  effective_year: 2024
+  effective_year_roc: 113
+  type: boundary_adjust
+  sources:
+  - v_id: 64000120-072
+    county: 高雄市
+    town: 鳳山區
+    village: 二甲里
+  targets:
+  - v_id: 64000120-072
+    county: 高雄市
+    town: 鳳山區
+    village: 二甲里
+  symdiff_pct:
+    64000120-072: 0.1322
+- id: 112_113_boundary_adjust_64000170-007
+  effective_year: 2024
+  effective_year_roc: 113
+  type: boundary_adjust
+  sources:
+  - v_id: 64000170-007
+    county: 高雄市
+    town: 仁武區
+    village: 文武里
+  - v_id: 64000170-011
+    county: 高雄市
+    town: 仁武區
+    village: 後安里
+  targets:
+  - v_id: 64000170-007
+    county: 高雄市
+    town: 仁武區
+    village: 文武里
+  - v_id: 64000170-011
+    county: 高雄市
+    town: 仁武區
+    village: 後安里
+  symdiff_pct:
+    64000170-007: 0.0506
+    64000170-011: 0.1115
+- id: 112_113_boundary_adjust_64000100-013
+  effective_year: 2024
+  effective_year_roc: 113
+  type: boundary_adjust
+  sources:
+  - v_id: 64000100-013
+    county: 高雄市
+    town: 旗津區
+    village: 中興里
+  - v_id: 64000100-S01
+    county: 高雄市
+    town: 旗津區
+    village: null
+  targets:
+  - v_id: 64000100-013
+    county: 高雄市
+    town: 旗津區
+    village: 中興里
+  - v_id: 64000100-S01
+    county: 高雄市
+    town: 旗津區
+    village: null
+  symdiff_pct:
+    64000100-013: 0.098
+    64000100-S01: 0.0645
+- id: 112_113_boundary_adjust_64000050-020
+  effective_year: 2024
+  effective_year_roc: 113
+  type: boundary_adjust
+  sources:
+  - v_id: 64000050-020
+    county: 高雄市
+    town: 三民區
+    village: 寶中里
+  - v_id: 64000050-028
+    county: 高雄市
+    town: 三民區
+    village: 寶龍里
+  targets:
+  - v_id: 64000050-020
+    county: 高雄市
+    town: 三民區
+    village: 寶中里
+  - v_id: 64000050-028
+    county: 高雄市
+    town: 三民區
+    village: 寶龍里
+  symdiff_pct:
+    64000050-020: 0.0636
+    64000050-028: 0.0894
+- id: 112_113_boundary_adjust_09020050-005
+  effective_year: 2024
+  effective_year_roc: 113
+  type: boundary_adjust
+  sources:
+  - v_id: 09020050-005
+    county: 金門縣
+    town: 烈嶼鄉
+    village: 黃埔村
+  targets:
+  - v_id: 09020050-005
+    county: 金門縣
+    town: 烈嶼鄉
+    village: 黃埔村
+  symdiff_pct:
+    09020050-005: 0.0679
+- id: 112_113_boundary_adjust_09020050-I01
+  effective_year: 2024
+  effective_year_roc: 113
+  type: boundary_adjust
+  sources:
+  - v_id: 09020050-I01
+    county: 金門縣
+    town: 烈嶼鄉
+    village: null
+  targets:
+  - v_id: 09020050-I01
+    county: 金門縣
+    town: 烈嶼鄉
+    village: null
+  symdiff_pct:
+    09020050-I01: 0.0614
+- id: 112_113_boundary_adjust_09020050-001
+  effective_year: 2024
+  effective_year_roc: 113
+  type: boundary_adjust
+  sources:
+  - v_id: 09020050-001
+    county: 金門縣
+    town: 烈嶼鄉
+    village: 上岐村
+  targets:
+  - v_id: 09020050-001
+    county: 金門縣
+    town: 烈嶼鄉
+    village: 上岐村
+  symdiff_pct:
+    09020050-001: 0.055
