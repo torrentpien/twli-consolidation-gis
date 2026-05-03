@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "twli-consolidate"
+version = "0.1.0"
+description = "Recompute panel data over Taiwan village (村里) consolidation history."
+requires-python = ">=3.9"
+dependencies = ["pandas>=1.5", "PyYAML>=5"]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["twli_consolidate*"]
+
+[tool.setuptools.package-data]
+twli_consolidate = ["data/village_changes.yaml"]

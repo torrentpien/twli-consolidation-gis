@@ -1,0 +1,21 @@
+Package: twliConsolidate
+Title: Recompute Panel Data Over Taiwan Village Consolidation History
+Version: 0.1.0
+Authors@R: person("twli-consolidation-gis", role = c("aut", "cre"),
+                  email = "noreply@example.org")
+Description: Provides utilities to load a structured crosswalk of Taiwan
+    village (li/cun) merge, split, rename and redistribute events, and to
+    re-aggregate a long-format panel dataset into Stable Analysis Units so
+    that socio-economic variables are comparable across years despite
+    administrative boundary changes.
+License: MIT + file LICENSE
+Depends: R (>= 4.0)
+Imports:
+    yaml,
+    dplyr (>= 1.0),
+    tidyr,
+    rlang
+Suggests:
+    testthat (>= 3.0)
+Encoding: UTF-8
+RoxygenNote: 7.3.1
