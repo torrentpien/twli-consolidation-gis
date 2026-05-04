@@ -23,7 +23,8 @@ DATA = ROOT / "data"
 OUT = ROOT / "crosswalk" / "village_changes.yaml"
 
 # 民國年 -> 西元年 (snapshot taken end of December)
-YEARS_ROC = [110, 111, 112, 113, 114]
+YEARS_ROC = [97, 98, 99, 100, 101, 102, 103, 104, 105, 106,
+             107, 108, 109, 110, 111, 112, 113, 114]
 
 
 def roc_to_ce(roc: int) -> int:
@@ -33,8 +34,11 @@ def roc_to_ce(roc: int) -> int:
 def load_year(roc: int) -> gpd.GeoDataFrame:
     p = DATA / f"{roc}年12月行政區人口統計_村里_SHP" / f"{roc}年12月行政區人口統計_村里.SHP"
     g = gpd.read_file(p, encoding="cp950")
+    # Older snapshots include rows with no V_ID (military zones, ports, etc.).
+    # They cannot participate in lineage tracking, so drop them.
+    g = g[g["V_ID"].notna()].copy()
     g["AREA"] = g.geometry.area
-    return g
+    return g.reset_index(drop=True)
 
 
 def overlap_table(src_df: gpd.GeoDataFrame, tgt_df: gpd.GeoDataFrame, src_ids: list[str], min_pct=0.01):
@@ -257,6 +261,15 @@ def main():
             "split": "一個來源村里分割為多個 (V_ID 數增加)",
             "redistribute": "M→N 重劃，多對多重新分配",
             "boundary_adjust": "V_ID 不變但幾何顯著變動 (>5% 對稱差)",
+        },
+        "transition_notes": {
+            2011: "民國99→100：五都升格 (新北、臺中、臺南、高雄)。約 2849 筆 rename"
+                  "事件均為同地理位置之 V_ID 大量重編。",
+            2015: "民國103→104：桃園升格直轄市。約 495 筆 rename 為桃園縣→桃園市之"
+                  "V_ID 重編。",
+            2019: "民國107→108：高雄市三民區等多區 V_ID 微調，並大量內政部圖資重新測"
+                  "繪 (>3000 個村里幾何 5% 以上變動，多為測量更新而非真正行政區劃調整)。",
+            2020: "民國108→109：高雄市部分 TOWN 代碼回退調整。",
         },
         "events": all_events,
     }
