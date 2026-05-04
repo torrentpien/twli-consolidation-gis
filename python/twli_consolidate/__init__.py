@@ -23,6 +23,8 @@ Typical usage:
 from .crosswalk import Event, bundled_crosswalk_path, load_crosswalk
 from .lineage import Lineage, build_lineage
 from .consolidate import consolidate_panel
+from .ref import build_ref, existence_intervals
+from .twli import li_sum, li_equ, li_shp
 
 __all__ = [
     "Event",
@@ -31,5 +33,10 @@ __all__ = [
     "Lineage",
     "build_lineage",
     "consolidate_panel",
+    "build_ref",
+    "existence_intervals",
+    "li_sum",
+    "li_equ",
+    "li_shp",
 ]
 __version__ = "0.1.0"
