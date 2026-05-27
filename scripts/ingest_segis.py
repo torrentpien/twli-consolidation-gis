@@ -103,7 +103,10 @@ def list_years(topic_dir: Path | str) -> list[int]:
 _BASE_COLS = ["COUNTY_ID", "COUNTY", "TOWN_ID", "TOWN", "V_ID", "VILLAGE"]
 
 
-def read_csv(path: Path | str) -> pd.DataFrame:
+def read_csv(
+    path: Path | str,
+    drop_aggregate_vids: bool = True,
+) -> pd.DataFrame:
     """Read a single year csv from SEGIS folder.
 
     - 自動編碼判斷後以 utf-8 餵 pandas
@@ -111,6 +114,9 @@ def read_csv(path: Path | str) -> pd.DataFrame:
     - 強制 V_ID 為 str
     - 自動加入 `year` 欄（從檔名解析）
     - 自動過濾財政部 TAG 非空白的彙整列
+    - 若 drop_aggregate_vids=True（預設），過濾 V_ID 末三碼為 999 的彙整列
+      （例如「64000030-999」是該鄉鎮無法分配個別村里的彙整數據；目前已知
+      財政部 csv 有此類列，其他主題未見。）
     """
     path = Path(path)
     meta = parse_filename(path.name)
@@ -145,12 +151,20 @@ def read_csv(path: Path | str) -> pd.DataFrame:
     # V_ID 標準化（去掉首尾空白）
     df["V_ID"] = df["V_ID"].astype(str).str.strip()
 
+    # 過濾彙整列（V_ID 末三碼 999）
+    if drop_aggregate_vids:
+        df = df.loc[~df["V_ID"].str.endswith("-999")].copy()
+
     return df
 
 
 # ---------- 整個主題 ----------
 
-def ingest_topic(topic_dir: Path | str, years: Iterable[int] | None = None) -> pd.DataFrame:
+def ingest_topic(
+    topic_dir: Path | str,
+    years: Iterable[int] | None = None,
+    drop_aggregate_vids: bool = True,
+) -> pd.DataFrame:
     """Read all year csvs under one topic folder, concat into a long-format df.
 
     Parameters
@@ -175,7 +189,7 @@ def ingest_topic(topic_dir: Path | str, years: Iterable[int] | None = None) -> p
             continue
         if year_filter is not None and meta["year"] not in year_filter:
             continue
-        dfs.append(read_csv(csv_path))
+        dfs.append(read_csv(csv_path, drop_aggregate_vids=drop_aggregate_vids))
 
     if not dfs:
         raise FileNotFoundError(f"No csvs ingested from {topic_dir}")

@@ -13,14 +13,17 @@ SUPPORTED_AGGS = {"sum", "mean", "first", "last", "min", "max",
 
 
 def _keep_if_unique(s: pd.Series):
-    """Return the single value if the group has exactly one V_ID member,
+    """Return the single value if the group has exactly one row,
     otherwise NaN.
 
     Use case: 衍生統計量（中位數、分位數、標準差、變異係數等）無法從區級彙總
-    重算。對 SAU 內單一 V_ID（未整併）保留原值；對多 V_ID SAU（整併過）標 NaN。
+    重算。對 SAU 內單一 V_ID（未整併）保留原值（即使該值原本就是 NaN）；
+    對多 V_ID SAU（整併過）一律標 NaN，不管 NaN 在 members 內如何分布——
+    因為即使只有一個 member 有值，把它當作整個 SAU 的代表在統計上不嚴謹。
     """
-    s = s.dropna()
-    return s.iloc[0] if len(s) == 1 else float("nan")
+    if len(s) == 1:
+        return s.iloc[0]
+    return float("nan")
 
 
 def consolidate_panel(
