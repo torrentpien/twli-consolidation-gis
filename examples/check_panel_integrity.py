@@ -14,17 +14,21 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "python"))
 
 import pandas as pd  # noqa: E402
 
 import twli_consolidate as tc  # noqa: E402
 
+from scripts.ingest_segis import ingest_topic, list_topics  # noqa: E402
+
 
 ROC_TO_AD = lambda roc: roc + 1911
 
 
 def read_pop_csv(path: Path) -> pd.DataFrame:
+    """讀 data_population/ 內 107、108 兩年 csv (UTF-8)."""
     m = re.match(r"(\d+)年12月行政區人口統計_村里\.csv$", path.name)
     year = ROC_TO_AD(int(m.group(1)))
     df = pd.read_csv(path, encoding="utf-8", skiprows=[1], dtype={"V_ID": str})
@@ -34,10 +38,15 @@ def read_pop_csv(path: Path) -> pd.DataFrame:
 
 
 def main() -> None:
+    # 來源 1: data_population/107-108
     data_dir = ROOT / "data_population"
     csvs = sorted(data_dir.glob("*年12月行政區人口統計_村里.csv"))
-    dfs = [read_pop_csv(p) for p in csvs]
-    df = pd.concat(dfs, ignore_index=True)[["V_ID", "year", "P_CNT"]]
+    dfs_local = [read_pop_csv(p) for p in csvs]
+    # 來源 2: SEGIS/行政部/行政區人口統計 109-113
+    segis_df = ingest_topic(list_topics()["行政部"]["行政區人口統計"])
+    df = pd.concat(dfs_local + [segis_df], ignore_index=True)[
+        ["V_ID", "year", "P_CNT"]
+    ]
     years = sorted(df["year"].unique())
 
     cw = list(tc.load_crosswalk(ROOT / "crosswalk" / "village_changes.yaml"))
