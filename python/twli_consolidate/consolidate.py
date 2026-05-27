@@ -9,7 +9,18 @@ from .lineage import Lineage
 
 
 SUPPORTED_AGGS = {"sum", "mean", "first", "last", "min", "max",
-                  "weighted_mean", "recompute"}
+                  "weighted_mean", "recompute", "keep_if_unique"}
+
+
+def _keep_if_unique(s: pd.Series):
+    """Return the single value if the group has exactly one V_ID member,
+    otherwise NaN.
+
+    Use case: 衍生統計量（中位數、分位數、標準差、變異係數等）無法從區級彙總
+    重算。對 SAU 內單一 V_ID（未整併）保留原值；對多 V_ID SAU（整併過）標 NaN。
+    """
+    s = s.dropna()
+    return s.iloc[0] if len(s) == 1 else float("nan")
 
 
 def consolidate_panel(
@@ -35,11 +46,13 @@ def consolidate_panel(
         Name of the year column (Gregorian integer).
     vars_spec : mapping
         Per-variable aggregation rule. Either a string shorthand
-        (``"sum" | "mean" | "first" | "last" | "min" | "max"``) or a dict::
+        (``"sum" | "mean" | "first" | "last" | "min" | "max" | "keep_if_unique"``)
+        or a dict::
 
             {"agg": "sum"}
             {"agg": "weighted_mean", "weight": "P_CNT"}
             {"agg": "recompute", "expr": "P_CNT / AREA"}
+            {"agg": "keep_if_unique"}  # 對 SAU 內單一 V_ID 保留原值，多 V_ID 標 NaN
 
         ``recompute`` rules run **after** all other aggregations. The
         expression is evaluated with :py:meth:`pandas.DataFrame.eval` and may
@@ -87,6 +100,8 @@ def consolidate_panel(
         a = rule["agg"]
         if a in {"sum", "mean", "first", "last", "min", "max"}:
             agg_map[col] = a
+        elif a == "keep_if_unique":
+            agg_map[col] = _keep_if_unique
         elif a == "weighted_mean":
             num, den = aux_cols[col]
             agg_map[num] = "sum"

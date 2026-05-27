@@ -214,3 +214,45 @@ def test_year_range_changes_lineage(panel):
     # there are no V_ID-change events, so it gets its own SAU.
     assert narrow.sau_of("10007020-030") == "SAU_10007020-030"
     assert narrow.sau_of("10007020-005") == "SAU_10007020-005"
+
+
+# ---------- keep_if_unique ----------
+
+def test_consolidate_keep_if_unique(panel, lineage_full):
+    """keep_if_unique: single-V_ID SAU preserves value, multi-V_ID SAU gets NaN.
+
+    Use case: 衍生統計量（中位數、分位數等）無法從區級彙總重算。
+    """
+    panel = panel.copy()
+    # 模擬「中位數」這類無法 sum 的指標：給每個 V_ID 一個固定的虛擬中位數值
+    panel["MEDIAN_INCOME"] = (panel["P_CNT"] * 0.1).round()
+
+    out = tc.consolidate_panel(
+        panel,
+        vid_col="V_ID",
+        year_col="year",
+        vars_spec={
+            "P_CNT": "sum",
+            "MEDIAN_INCOME": "keep_if_unique",
+        },
+        lineage=lineage_full,
+        keep_member_list=True,
+    )
+
+    # 鹿港頂厝里在 2022 被 005+030+031 三個 V_ID 整併 → MEDIAN_INCOME 應為 NaN
+    lukang_sau = lineage_full.sau_of("10007020-005")
+    lukang_2022 = out[(out["sau_id"] == lukang_sau) & (out["year"] == 2022)].iloc[0]
+    assert len(lukang_2022["members"]) == 3
+    assert pd.isna(lukang_2022["MEDIAN_INCOME"])
+
+    # 鹿港頂厝里在 2021（拆分前）僅 005 一個 V_ID → 保留原值
+    lukang_2021 = out[(out["sau_id"] == lukang_sau) & (out["year"] == 2021)].iloc[0]
+    assert len(lukang_2021["members"]) == 1
+    assert not pd.isna(lukang_2021["MEDIAN_INCOME"])
+
+    # 未受整併的村里：所有年都保留原值
+    unaffected_sau = lineage_full.sau_of("09020010-001")  # 連江縣某村里
+    unaffected_rows = out[out["sau_id"] == unaffected_sau]
+    for _, r in unaffected_rows.iterrows():
+        assert len(r["members"]) == 1
+        assert not pd.isna(r["MEDIAN_INCOME"])
