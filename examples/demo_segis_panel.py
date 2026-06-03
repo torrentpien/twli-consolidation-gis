@@ -6,7 +6,7 @@ twli_consolidate 的整套流程通暢。
 執行：
     python examples/demo_segis_panel.py
 輸出：
-    examples/output/demo_segis_population_109_113.csv
+    examples/output/demo_segis_population.csv
 
 驗證項目（執行時印出）：
 1) 每年原始 V_ID 數 vs SAU 列數
@@ -58,7 +58,7 @@ def main() -> None:
     )
     print(f"整併後 panel：{len(out):,} 列  (每 SAU × year 一列)")
 
-    out_path = ROOT / "examples" / "output" / "demo_segis_population_109_113.csv"
+    out_path = ROOT / "examples" / "output" / "demo_segis_population.csv"
     out_path.parent.mkdir(parents=True, exist_ok=True)
     out.to_csv(out_path, encoding="utf-8-sig", index=False)
     print(f"\n寫入 {out_path.relative_to(ROOT)}")

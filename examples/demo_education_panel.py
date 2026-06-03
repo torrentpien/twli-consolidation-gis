@@ -10,7 +10,7 @@
 執行：
     python examples/demo_education_panel.py
 輸出：
-    examples/output/demo_segis_education_109_113.csv
+    examples/output/demo_segis_education.csv
 """
 from __future__ import annotations
 
@@ -54,7 +54,7 @@ def main() -> None:
     print(f"教育部 panel: {len(out):,} 列 = "
           f"{len(out) // len(years)} SAU × {len(years)} 年 (109-113)")
 
-    out_path = ROOT / "examples" / "output" / "demo_segis_education_109_113.csv"
+    out_path = ROOT / "examples" / "output" / "demo_segis_education.csv"
     out.to_csv(out_path, encoding="utf-8-sig", index=False)
     print(f"寫入 {out_path.relative_to(ROOT)}")
 

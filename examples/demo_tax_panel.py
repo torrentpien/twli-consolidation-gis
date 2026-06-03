@@ -18,7 +18,7 @@
 執行：
     python examples/demo_tax_panel.py
 輸出：
-    examples/output/demo_segis_tax_109_111.csv
+    examples/output/demo_segis_tax.csv
 """
 from __future__ import annotations
 
@@ -74,7 +74,7 @@ def main() -> None:
     print(f"財政部 panel: {len(out):,} 列 = "
           f"{len(out) // len(years)} SAU × {len(years)} 年 ({years[0]}-{years[-1]})")
 
-    out_path = ROOT / "examples" / "output" / "demo_segis_tax_109_111.csv"
+    out_path = ROOT / "examples" / "output" / "demo_segis_tax.csv"
     out.to_csv(out_path, encoding="utf-8-sig", index=False)
     print(f"寫入 {out_path.relative_to(ROOT)}")
 

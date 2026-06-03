@@ -1,21 +1,21 @@
 """Phase 5: 跨來源 wide panel — 把行政部、教育部、財政部主題在 (sau_id, year) join 成寬表.
 
-涵蓋主題（5 個）：
+涵蓋主題（4 個；原住民系列依研究方向已排除）：
 1. 行政部・人口統計           4 欄 (H_CNT, P_CNT, M_CNT, F_CNT)
 2. 行政部・三段年齡組         9 欄 (A0A14/A15A64/A65UP × 總/M/F)
-3. 行政部・原住民人口統計     10 欄 (O_CNT, O1, O2, NON_O × 總/M/F)
-4. 教育部・15+ 教育程度       9 欄 (E1314 博士 ~ E04 不識字)
-5. 財政部・所得稅             8 欄 (FLD01-08，含 keep_if_unique)
+3. 教育部・15+ 教育程度       9 欄 (E1314 博士 ~ E04 不識字)
+4. 財政部・所得稅             8 欄 (FLD01-08，含 keep_if_unique)
 
 年度範圍策略：
-- 行政部、教育部都涵蓋 109-113 (5 年)
-- 財政部只到 111 (3 年)
-- 採取「聯集」：panel 涵蓋 109-113 五年，財政部欄位在 112-113 為 NaN
+- 行政部、教育部涵蓋 100-113 (14 年)
+- 財政部涵蓋 100-112 (13 年)
+- 採取「聯集」：panel 涵蓋 100-113 共 14 年，財政部欄位在 113 為 NaN
+- 年度範圍自動由人口統計主題的 csv 偵測
 
 執行：
     python examples/demo_multi_source_panel.py
 輸出：
-    examples/output/demo_multi_source_panel_109_113.csv
+    examples/output/demo_multi_source_panel.csv
 """
 from __future__ import annotations
 
@@ -38,7 +38,6 @@ from scripts.vars_spec import INGEST_SPECS, topic_key  # noqa: E402
 TOPICS = [
     ("行政部", "行政區人口統計", "pop"),
     ("行政部", "行政區三段年齡組性別人口統計", "age3"),
-    ("行政部", "行政區原住民人口統計", "ip"),
     ("教育部", "行政區15歲以上人口教育程度統計", "edu"),
     ("財政部", "綜合所得稅所得總額申報統計", "tax"),
 ]
@@ -64,9 +63,13 @@ def consolidate_topic(folder: Path, ministry: str, topic: str,
 def main() -> None:
     topics_tree = list_topics()
 
-    # 用 109-113 範圍建一次 lineage 共用
+    # 自動由人口統計偵測 panel 年度範圍
+    pop_df_sample = ingest_topic(topics_tree["行政部"]["行政區人口統計"])
+    yr_min = int(pop_df_sample["year"].min())
+    yr_max = int(pop_df_sample["year"].max())
     cw = tc.load_crosswalk(ROOT / "crosswalk" / "village_changes.yaml")
-    lineage = tc.build_lineage(cw, year_range=(2020, 2024))
+    lineage = tc.build_lineage(cw, year_range=(yr_min, yr_max))
+    print(f"Panel 年度範圍：{yr_min}–{yr_max}")
 
     panels: dict[str, pd.DataFrame] = {}
     for ministry, topic, alias in TOPICS:
@@ -118,35 +121,33 @@ def main() -> None:
     # 2. 各主題覆蓋率（NaN 比例）
     print("\n=== 驗證 2: 各主題在 wide panel 內覆蓋率 ===")
     print(f"{'topic':<6}  {'sample col':<12}  {'年份':>6}  {'NaN 比例':>10}")
-    sample_cols = {"age3": "A0A14_CNT", "ip": "O_CNT", "edu": "E1314_CNT",
-                   "tax": "FLD01"}
+    sample_cols = {"age3": "A0A14_CNT", "edu": "E1314_CNT", "tax": "FLD01"}
     for alias, col in sample_cols.items():
         for y in sorted(wide["year"].unique()):
             yr = wide[wide["year"] == y]
             nan_pct = yr[col].isna().mean() * 100
             print(f"{alias:<6}  {col:<12}  {y:>6}  {nan_pct:>9.2f}%")
 
-    # 3. 跨來源加總交叉驗證 (raw csv 已知會差，這裡 spot check 確認套件忠實傳遞)
+    # 3. 跨來源加總交叉驗證 (P_CNT vs 三段年齡組總和)
     print("\n=== 驗證 3: 跨來源加總 spot check ===")
-    print(f"{'year':>6}  {'P_CNT':>14}  {'A_total':>14}  {'O+NON_O':>14}")
+    print(f"{'year':>6}  {'P_CNT':>14}  {'3-group sum':>14}  ok")
     for y in sorted(wide["year"].unique()):
         yr = wide[wide["year"] == y]
         p = int(yr["P_CNT"].sum())
         a3 = int(yr[["A0A14_CNT", "A15A64_CNT", "A65UP_CNT"]].sum().sum())
-        ip_sum = int(yr[["O_CNT", "NON_O_CNT"]].dropna().sum().sum())
-        print(f"{y:>6}  {p:>14,}  {a3:>14,}  {ip_sum:>14,}")
+        flag = "✓" if p == a3 else f"✗ diff={p-a3:+,}"
+        print(f"{y:>6}  {p:>14,}  {a3:>14,}  {flag}")
 
     # 4. 鹿港頂厝里 SAU 跨年觀察（跨來源視角）
     print("\n=== 驗證 4: 鹿港頂厝里 SAU 跨年（跨來源視角）===")
     members = {"10007020-005", "10007020-030", "10007020-031"}
     rows = wide[wide["members_pop"].apply(lambda ms: bool(set(ms) & members))]
-    cols = ["year", "VILLAGE", "P_CNT", "A15A64_CNT", "O_CNT",
+    cols = ["year", "VILLAGE", "P_CNT", "A15A64_CNT",
             "E2122_CNT", "FLD02", "members_pop"]
     print(rows[cols].sort_values("year").to_string(index=False))
 
     # 輸出
-    out_path = (ROOT / "examples" / "output" /
-                "demo_multi_source_panel_109_113.csv")
+    out_path = ROOT / "examples" / "output" / "demo_multi_source_panel.csv"
     out_path.parent.mkdir(parents=True, exist_ok=True)
     wide.to_csv(out_path, encoding="utf-8-sig", index=False)
     print(f"\n寫入 {out_path.relative_to(ROOT)}  "

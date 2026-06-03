@@ -1,15 +1,17 @@
-"""Phase B4: 行政部 9 主題整併後驗證腳本.
+"""Phase B4: 行政部主題整併後驗證腳本（已排除原住民系列）.
 
-涵蓋 9 個主題：
-- 7 個直接整併主題：人口統計、三段年齡、五歲年齡、十歲年齡、
-  分齡兒少、原住民人口統計、原住民十歲年齡組
-- 2 個衍生指標主題：人口指標、原住民人口指標（不直接整併，
-  由 base 主題 sum 後 recompute；本腳本只標示說明）
+涵蓋 6 個非原住民主題：
+- 5 個直接整併主題：人口統計、三段年齡、五歲年齡、十歲年齡、分齡兒少
+- 1 個衍生指標主題：人口指標（不直接整併，由 base 主題 sum 後 recompute；
+  本腳本只標示說明）
+
+(原住民人口統計／原住民人口指標／原住民十歲年齡組三個主題依研究方向
+排除，見 scripts/vars_spec.py SKIPPED_TOPICS。)
 
 驗證層次：
 A. 每個主題 panel 基本檢查（原始 V_ID 數 vs SAU 列數、跨年 SAU 一致性）
 B. 主題內欄位加總（性別合計、各組合計）
-C. 主題間交叉驗證（人口統計 P_CNT == 三段年齡組總和、原住民 O+NON_O == 全人口...）
+C. 主題間交叉驗證（人口統計 P_CNT == 三段年齡組總和、五歲組、十歲組總和）
 
 執行：
     python examples/check_segis_admin_topics.py
@@ -61,8 +63,6 @@ def main() -> None:
         "行政區五歲年齡組性別人口統計",
         "行政區十歲年齡組性別人口統計",
         "行政區分齡兒童及少年性別人口統計",
-        "行政區原住民人口統計",
-        "行政區原住民十歲年齡組性別人口統計",
     ]
 
     years_seen = None
@@ -116,18 +116,6 @@ def main() -> None:
         flag = "✓" if bad == 0 else f"✗ {bad}/3 不符"
         print(f"  {y}: {flag}")
 
-    # B2. 原住民人口統計：O_CNT == O1+O2 == O_M+O_F
-    print("\nB2. 原住民人口統計 (O_CNT == O1+O2 == O_M+O_F)")
-    pip_ = panels["行政區原住民人口統計"]
-    for y in years_seen:
-        yr = pip_[pip_["year"] == y]
-        o = yr["O_CNT"].sum()
-        o12 = yr["O1_CNT"].sum() + yr["O2_CNT"].sum()
-        omf = yr["O_M_CNT"].sum() + yr["O_F_CNT"].sum()
-        f1 = "✓" if o == o12 else "✗"
-        f2 = "✓" if o == omf else "✗"
-        print(f"  {y}: O={o:,}, O1+O2={o12:,} {f1},  O_M+O_F={omf:,} {f2}")
-
     # ============================================================
     # C. 主題間交叉驗證
     # ============================================================
@@ -139,8 +127,6 @@ def main() -> None:
     p_pop = panels["行政區人口統計"]
     p5 = panels["行政區五歲年齡組性別人口統計"]
     p10 = panels["行政區十歲年齡組性別人口統計"]
-    p_ip = panels["行政區原住民人口統計"]
-    p_ip10 = panels["行政區原住民十歲年齡組性別人口統計"]
 
     # C1. P_CNT == 三段年齡組總和
     print("\nC1. P_CNT (人口統計) == A0A14 + A15A64 + A65UP (三段年齡組)")
@@ -180,23 +166,6 @@ def main() -> None:
         flag = "✓" if a == b else f"✗ diff={a-b:+,}"
         print(f"  {y}: M_CNT={a:>11,}, 3-group M={b:>11,}  {flag}")
 
-    # C5. 原住民 + 非原住民 == 總人口
-    print("\nC5. P_CNT == O_CNT + NON_O_CNT")
-    for y in years_seen:
-        a = p_pop.loc[p_pop["year"] == y, "P_CNT"].sum()
-        b = (p_ip.loc[p_ip["year"] == y, ["O_CNT", "NON_O_CNT"]].sum().sum())
-        flag = "✓" if a == b else f"✗ diff={a-b:+,}"
-        print(f"  {y}: P_CNT={a:>11,}, O+NON_O={b:>11,}  {flag}")
-
-    # C6. 原住民 O_CNT vs 原住民十歲年齡組總和
-    print("\nC6. O_CNT (原住民人口統計) == 原住民十歲年齡組所有 M/F 加總")
-    ip10_cols = [c for c in p_ip10.columns if c.endswith("_M_CNT") or c.endswith("_F_CNT")]
-    for y in years_seen:
-        a = p_ip.loc[p_ip["year"] == y, "O_CNT"].sum()
-        b = int(p_ip10.loc[p_ip10["year"] == y, ip10_cols].sum().sum())
-        flag = "✓" if a == b else f"✗ diff={a-b:+,}"
-        print(f"  {y}: O_CNT={a:>11,}, IP10 total={b:>11,}  {flag}")
-
     # ============================================================
     # D. 已知 raw csv 異常（非套件 bug，驗證後標示）
     # ============================================================
@@ -205,37 +174,17 @@ def main() -> None:
     print("D. 已知 RAW csv 異常（非套件 bug）")
     print("=" * 72)
 
-    # D1. 2020 分齡兒少少 2 個 V_ID
-    print("\nD1. 分齡兒少 2020 少 2 個 V_ID (raw csv 本身少)")
-    pop_2020_vids = set(raw_dfs["行政區人口統計"].loc[
-        raw_dfs["行政區人口統計"]["year"] == 2020, "V_ID"])
-    ch_2020_vids = set(raw_dfs["行政區分齡兒童及少年性別人口統計"].loc[
-        raw_dfs["行政區分齡兒童及少年性別人口統計"]["year"] == 2020, "V_ID"])
-    miss = sorted(pop_2020_vids - ch_2020_vids)
-    print(f"  缺少 V_ID: {miss}")
-    print(f"  推測：該村里該年無 18 歲以下兒少人口，SEGIS 略過該列")
-
-    # D2. 2020 原住民十歲組少 423 個 V_ID
-    print("\nD2. 原住民十歲年齡組 2020 少 423 個 V_ID (raw csv 本身少)")
-    ip_2020_vids = set(raw_dfs["行政區原住民人口統計"].loc[
-        raw_dfs["行政區原住民人口統計"]["year"] == 2020, "V_ID"])
-    ip10_2020_vids = set(raw_dfs["行政區原住民十歲年齡組性別人口統計"].loc[
-        raw_dfs["行政區原住民十歲年齡組性別人口統計"]["year"] == 2020, "V_ID"])
-    miss10 = ip_2020_vids - ip10_2020_vids
-    print(f"  缺少 {len(miss10)} 個 V_ID")
-    print(f"  推測：2020 SEGIS 此主題只列「有原住民人口」的村里，2021+ 補齊全村里")
-
-    # D3. C5 P_CNT != O+NON_O (raw csv 本身就不等)
-    print("\nD3. P_CNT != O_CNT + NON_O_CNT (raw csv 本身就不等)")
-    print(f"  {'year':>6}  {'P_CNT':>14}  {'O+NON_O':>14}  {'diff':>10}")
+    # D1. 分齡兒少在某些年度少 V_ID
+    print("\nD1. 分齡兒少 V_ID 覆蓋（vs 人口統計）")
     for y in years_seen:
-        p = int(raw_dfs["行政區人口統計"]
-                .loc[raw_dfs["行政區人口統計"]["year"] == y, "P_CNT"].sum())
-        ip = raw_dfs["行政區原住民人口統計"]
-        on = int(ip.loc[ip["year"] == y, ["O_CNT", "NON_O_CNT"]].sum().sum())
-        print(f"  {y:>6}  {p:>14,}  {on:>14,}  {p - on:>+10,}")
-    print(f"  解讀：2021+ NON_O_CNT 統計範圍可能不含外籍/無戶籍人口，")
-    print(f"        SEGIS 來源資料本身的定義差異，使用者需注意。")
+        pop_vids = set(raw_dfs["行政區人口統計"].loc[
+            raw_dfs["行政區人口統計"]["year"] == y, "V_ID"])
+        ch_vids = set(raw_dfs["行政區分齡兒童及少年性別人口統計"].loc[
+            raw_dfs["行政區分齡兒童及少年性別人口統計"]["year"] == y, "V_ID"])
+        miss = pop_vids - ch_vids
+        flag = "✓" if not miss else f"✗ 缺 {len(miss)}: {sorted(miss)[:3]}"
+        print(f"  {y}: {flag}")
+    print(f"  推測：缺列村里該年無 18 歲以下兒少人口，SEGIS 略過該列")
 
     # ============================================================
     # E. 衍生指標主題（不直接整併，只列出說明）
@@ -244,7 +193,7 @@ def main() -> None:
     print("=" * 72)
     print("E. 衍生指標主題（不直接整併，由 base 主題 recompute）")
     print("=" * 72)
-    for topic_name in ["行政區人口指標", "行政區原住民人口指標"]:
+    for topic_name in ["行政區人口指標"]:
         key = topic_key("行政部", topic_name)
         if key not in DERIVED_FORMULAS:
             continue

@@ -63,22 +63,12 @@ INGEST_SPECS: dict[str, dict[str, str | dict]] = {
            for lo in (0, 6, 12)
            for s in ("", "M_", "F_")},
     },
-    "行政部・行政區原住民人口統計": {
-        # O 原住民、O1 山地、O2 平地 各含總/男/女 + NON_O = 10 欄
-        "O_CNT": "sum",  "O_M_CNT": "sum",  "O_F_CNT": "sum",
-        "O1_CNT": "sum", "O1_M_CNT": "sum", "O1_F_CNT": "sum",
-        "O2_CNT": "sum", "O2_M_CNT": "sum", "O2_F_CNT": "sum",
-        "NON_O_CNT": "sum",
-    },
-    "行政部・行政區原住民十歲年齡組性別人口統計": {
-        # 11 組（0-9..100UP）× 性別（M, F）= 22 欄，無總計欄
-        **{f"A{lo}A{lo+9}_{s}_CNT": "sum"
-           for lo in range(0, 100, 10)
-           for s in ("M", "F")},
-        **{f"A100UP_{s}_CNT": "sum" for s in ("M", "F")},
-    },
-    # 「人口指標」與「原住民人口指標」不在這裡——它們是 derived,
-    # 從上面 base 主題整併後 recompute，見 DERIVED_FORMULAS。
+    # 原住民系列 3 主題 (人口統計/十歲年齡組/人口指標) 依研究方向決議**排除**，
+    # 不納入 INGEST_SPECS / DERIVED_FORMULAS。SEGIS 內仍保留原始 csv（2020-2024,
+    # 5 年），需要時可單獨 ingest 使用。完整名單見 SKIPPED_TOPICS。
+
+    # 「人口指標」是 derived，由人口統計 + 三段年齡組 sum 後 recompute，
+    # 見 DERIVED_FORMULAS（人口指標不在 INGEST_SPECS 內）。
 
     # =====================================================================
     # 教育部 1 主題
@@ -135,18 +125,19 @@ DERIVED_FORMULAS: dict[str, dict[str, dict]] = {
         "A65_A0A14_RAT":    {"expr": "A65UP_CNT / A0A14_CNT * 100",
                              "desc": "老化指數 = 65+ / 0-14 × 100"},
     },
-    "行政部・行政區原住民人口指標": {
-        # NOTE: 原住民人口的 0-14 / 15-64 / 65+ 分組無對應 SEGIS csv（原住民
-        # 十歲年齡組是 10 歲組，無法精確拆出 5 歲組對齊 A15A64）。本主題的
-        # 扶養比/扶幼比/扶老比/老化指數實作目前 skip；只 recompute O_PER。
-        "O_PER": {
-            # base = 整併後「行政區人口統計」(P_CNT) + 「行政區原住民人口統計」(O_CNT)
-            "expr": "O_CNT / P_CNT * 100",
-            "desc": "原住民人口比率 = 原住民 / 總人口 × 100",
-        },
-        # O_DEPENDENCY_PER / O_A0A14_A15A65_PER / O_A65UP_A15A64_PER /
-        # O_A65_A0A14_PER：需要原住民年齡 5 歲組或三段年齡（SEGIS 未提供），skip。
-    },
+    # 原住民人口指標：依研究方向決議排除，見 SKIPPED_TOPICS。
+}
+
+
+# ---------- 排除的主題（保留紀錄）----------
+
+SKIPPED_TOPICS = {
+    "行政部・行政區原住民人口統計":
+        "依研究方向決議排除；SEGIS 仍保留原始 csv (2020-2024)。",
+    "行政部・行政區原住民人口指標":
+        "依研究方向決議排除；衍生指標，原本應由原住民人口 + 年齡 recompute。",
+    "行政部・行政區原住民十歲年齡組性別人口統計":
+        "依研究方向決議排除；SEGIS 仍保留原始 csv (2020-2024)。",
 }
 
 
@@ -177,3 +168,7 @@ if __name__ == "__main__":
         print(f"  {k}  ({len(formulas)} formulas)")
         for col, info in formulas.items():
             print(f"    {col}: {info['expr']}  # {info['desc']}")
+    print()
+    print("SKIPPED_TOPICS:")
+    for k, reason in SKIPPED_TOPICS.items():
+        print(f"  {k}  ← {reason}")
